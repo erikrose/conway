@@ -22,19 +22,24 @@ def main():
     atexit.register(stdout.write, term.cnorm)
     print term.civis,
 
-    for i in range(50):
-        print term.clear,
-        draw(board, term)
-        sleep(0.05)
-        board = next_board(board, wrap=die)
-
-
-def draw(board, term):
-    """Draw a set of points to the terminal."""
     with term.location():  # snap back when done
-        for (x, y), state in board.iteritems():
-            print term.move(y, x) + term.on_color(state)(' '),
-            stdout.flush()
+        for i in range(50):
+            draw(board, term)
+            sleep(0.05)
+            board, old_board = next_board(board, wrap=die), board
+            clear(old_board, term)
+
+
+def clear(board, term):
+    for x, y in board.iterkeys():
+        print term.move(y, x) + ' ',
+
+
+def draw(board, term, colors=(9, 10, 14)):
+    """Draw a set of points to the terminal."""
+    for (x, y), state in board.iteritems():
+        print term.move(y, x) + term.on_color(colors[state])(' '),
+        stdout.flush()
 
 
 def next_board(board, wrap=lambda p: p):
@@ -54,18 +59,17 @@ def next_board(board, wrap=lambda p: p):
 
     for point in points_to_recalc:
         count = sum((neigh in board) for neigh in neighbors(point))
-        x, y = point
         if count == 3:
             if point in board:
-                state = 9
+                state = 0
             else:
-                state = 10
+                state = 1
         elif count == 2 and point in board:
-            state = 11
+            state = 2
         else:
-            state = 0
+            state = None
 
-        if state:
+        if state is not None:
             wrapped = wrap(point)
             if wrapped:
                 new_board[wrapped] = state
