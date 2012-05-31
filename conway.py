@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import atexit
 from itertools import chain
 from sys import stdout
 from time import sleep
@@ -15,19 +16,24 @@ def main():
         return x, y
 
     term = Terminal()
-    board = set([(10, 10), (11, 10), (12, 10), (10, 11), (11, 12)])
+    board = dict(((x, y), 1) for x, y in [(10, 10), (11, 10), (12, 10), (10, 11), (11, 12)])
+
+    # Hide the cursor, but show it on exit:
+    atexit.register(stdout.write, term.cnorm)
+    print term.civis,
+
     for i in range(50):
+        print term.clear,
         draw(board, term)
-        sleep(0.1)
+        sleep(0.05)
         board = next_board(board, wrap=die)
 
 
 def draw(board, term):
     """Draw a set of points to the terminal."""
     with term.location():  # snap back when done
-        print term.clear,
-        for x, y in board:
-            print term.move(y, x) + '#',
+        for (x, y), state in board.iteritems():
+            print term.move(y, x) + term.on_color(state)(' '),
             stdout.flush()
 
 
@@ -41,18 +47,29 @@ def next_board(board, wrap=lambda p: p):
         to wrap to the other edge of the screen
 
     """
-    new_board = set()
+    new_board = {}
 
     # We need consider only the points that are alive and their neighbors:
-    points_to_recalc = board | set(chain(*map(neighbors, board)))
+    points_to_recalc = set(board.iterkeys()) | set(chain(*map(neighbors, board)))
 
     for point in points_to_recalc:
         count = sum((neigh in board) for neigh in neighbors(point))
         x, y = point
-        if count == 3 or (count == 2 and point in board):
+        if count == 3:
+            if point in board:
+                state = 9
+            else:
+                state = 10
+        elif count == 2 and point in board:
+            state = 11
+        else:
+            state = 0
+
+        if state:
             wrapped = wrap(point)
             if wrapped:
-                new_board.add(wrapped)
+                new_board[wrapped] = state
+                
     return new_board
 
 
