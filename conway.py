@@ -85,7 +85,7 @@ def next_board(board, wrap=lambda p: p):
             wrapped = wrap(point)
             if wrapped:
                 new_board[wrapped] = state
-                
+
     return new_board
 
 
