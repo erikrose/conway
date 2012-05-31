@@ -20,12 +20,14 @@ from blessings import Terminal
 def main():
     """Play Conway's Game of Life on the terminal."""
     def die((x, y)):
-        if not (x < 0 or x >= term.width or
-                y < 0 or y >= term.height):
+        if not (x < 0 or x >= width or
+                y < 0 or y >= height):
             return x, y
 
     term = Terminal()
-    board = random_board(term.width - 1, term.height - 1)
+    width = term.width
+    height = term.height
+    board = random_board(width - 1, height - 1)
 
     print term.civis,  # hide cursor
     print term.clear,
