@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+"""Conway's Game of Life, drawn to the terminal care of the Blessings lib
+
+A board is represented like this::
+
+    {(x, y): state,
+     ...}
+
+...where ``state`` is an int from 0..2 representing a color.
+
+"""
 from itertools import chain
 from random import randint
 from sys import stdout
@@ -23,6 +33,7 @@ def main():
         try:
             board = next_board(board, wrap=die)
             draw(board, term)
+            stdout.flush()
             sleep(0.05)
         except KeyboardInterrupt:
             print term.cnorm,
@@ -35,27 +46,24 @@ def main():
 def random_board(max_x, max_y):
     """Return a random board with given max x and y coords."""
     LOAD_FACTOR = 10  # Smaller means more crowded.
-    board = {}
-    for _ in range(int(max_x * max_y / LOAD_FACTOR)):
-        board[(randint(0, max_x), randint(0, max_y))] = 0
-    return board
+    return dict(((randint(0, max_x), randint(0, max_y)), 0) for _ in
+                xrange(int(max_x * max_y / LOAD_FACTOR)))
 
 
 def clear(board, term):
-    """Clear the droppings of the given board, without flushing."""
+    """Clear the droppings of the given board."""
     for x, y in board.iterkeys():
         print term.move(y, x) + ' ',
 
 
 def draw(board, term, colors=(9, 10, 14)):
-    """Draw a set of points to the terminal, and flush."""
+    """Draw a board to the terminal."""
     for (x, y), state in board.iteritems():
         print term.move(y, x) + term.on_color(colors[state])(' '),
-    stdout.flush()
 
 
 def next_board(board, wrap=lambda p: p):
-    """Given a set of "on" (x, y) points, return the next set.
+    """Given a board, return the board one interation later.
 
     Adapted from Jack Diedrich's implementation from his 2012 PyCon talk "Stop
     Writing Classes"
@@ -89,9 +97,11 @@ def next_board(board, wrap=lambda p: p):
     return new_board
 
 
-def neighbors(point):
+def neighbors((x, y)):
     """Return the (possibly out of bounds) neighbors of a point."""
-    x, y = point
+    # TODO: Don't return out-of-bounds points. Their inherent non-existent is
+    # inconsistent with a flexible wrap() function. Either do it right, or
+    # hard-code the "borders are dead" assumption.
     yield x + 1, y
     yield x - 1, y
     yield x, y + 1
