@@ -10,10 +10,9 @@ from blessings import Terminal
 def main():
     """Play Conway's Game of Life on the terminal."""
     def die((x, y)):
-        if (x < 0 or x >= term.width or
-            y < 0 or y >= term.height):
-            return None
-        return x, y
+        if not (x < 0 or x >= term.width or
+                y < 0 or y >= term.height):
+            return x, y
 
     term = Terminal()
     board = random_board(term.width - 1, term.height - 1)
@@ -22,15 +21,15 @@ def main():
     print term.clear,
     while True:
         try:
+            board = next_board(board, wrap=die)
             draw(board, term)
             sleep(0.05)
-            board, old_board = next_board(board, wrap=die), board
         except KeyboardInterrupt:
             print term.cnorm,
             stdout.flush()
             break
         finally:
-            clear(old_board, term)
+            clear(board, term)
 
 
 def random_board(max_x, max_y):
