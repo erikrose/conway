@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import atexit
 from itertools import chain
+from random import randint
 from sys import stdout
 from time import sleep
 
@@ -16,30 +16,43 @@ def main():
         return x, y
 
     term = Terminal()
-    board = dict(((x, y), 1) for x, y in [(10, 10), (11, 10), (12, 10), (10, 11), (11, 12)])
+    board = random_board(term.width - 1, term.height - 1)
 
-    # Hide the cursor, but show it on exit:
-    atexit.register(stdout.write, term.cnorm)
-    print term.civis,
-
-    with term.location():  # snap back when done
-        for i in range(50):
+    print term.civis,  # hide cursor
+    print term.clear,
+    while True:
+        try:
             draw(board, term)
             sleep(0.05)
             board, old_board = next_board(board, wrap=die), board
+        except KeyboardInterrupt:
+            print term.cnorm,
+            stdout.flush()
+            break
+        finally:
             clear(old_board, term)
 
 
+def random_board(max_x, max_y):
+    """Return a random board with given max x and y coords."""
+    LOAD_FACTOR = 10  # Smaller means more crowded.
+    board = {}
+    for _ in range(int(max_x * max_y / LOAD_FACTOR)):
+        board[(randint(0, max_x), randint(0, max_y))] = 0
+    return board
+
+
 def clear(board, term):
+    """Clear the droppings of the given board, without flushing."""
     for x, y in board.iterkeys():
         print term.move(y, x) + ' ',
 
 
 def draw(board, term, colors=(9, 10, 14)):
-    """Draw a set of points to the terminal."""
+    """Draw a set of points to the terminal, and flush."""
     for (x, y), state in board.iteritems():
         print term.move(y, x) + term.on_color(colors[state])(' '),
-        stdout.flush()
+    stdout.flush()
 
 
 def next_board(board, wrap=lambda p: p):
@@ -49,7 +62,7 @@ def next_board(board, wrap=lambda p: p):
     Writing Classes"
 
     :arg wrap: A callable which takes a point and transforms it, for example
-        to wrap to the other edge of the screen
+        to wrap to the other edge of the screen. Return None to remove a point.
 
     """
     new_board = {}
@@ -78,6 +91,7 @@ def next_board(board, wrap=lambda p: p):
 
 
 def neighbors(point):
+    """Return the (possibly out of bounds) neighbors of a point."""
     x, y = point
     yield x + 1, y
     yield x - 1, y
