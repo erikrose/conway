@@ -20,8 +20,8 @@ from blessings import Terminal
 def main():
     """Play Conway's Game of Life on the terminal."""
     def die((x, y)):
-        if not (x < 0 or x >= width or
-                y < 0 or y >= height):
+        """Pretend any out-of-bounds cell is dead."""
+        if 0 < x < width and 0 < y < height:
             return x, y
 
     term = Terminal()
@@ -80,7 +80,8 @@ def next_board(board, wrap=lambda p: p):
     points_to_recalc = set(board.iterkeys()) | set(chain(*map(neighbors, board)))
 
     for point in points_to_recalc:
-        count = sum((neigh in board) for neigh in neighbors(point))
+        count = sum((neigh in board) for neigh in
+                    (wrap(n) for n in neighbors(point) if n))
         if count == 3:
             if point in board:
                 state = 0
@@ -101,9 +102,6 @@ def next_board(board, wrap=lambda p: p):
 
 def neighbors((x, y)):
     """Return the (possibly out of bounds) neighbors of a point."""
-    # TODO: Don't return out-of-bounds points. Their inherent non-existent is
-    # inconsistent with a flexible wrap() function. Either do it right, or
-    # hard-code the "borders are dead" assumption.
     yield x + 1, y
     yield x - 1, y
     yield x, y + 1
