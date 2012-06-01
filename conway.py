@@ -38,11 +38,10 @@ def main():
             stdout.flush()
             sleep(0.05)
         except KeyboardInterrupt:
-            print term.cnorm,
-            stdout.flush()
             break
         finally:
             clear(board, term)
+    print term.cnorm
 
 
 def random_board(max_x, max_y):
@@ -83,10 +82,7 @@ def next_board(board, wrap=lambda p: p):
         count = sum((neigh in board) for neigh in
                     (wrap(n) for n in neighbors(point) if n))
         if count == 3:
-            if point in board:
-                state = 0
-            else:
-                state = 1
+            state = 0 if point in board else 1
         elif count == 2 and point in board:
             state = 2
         else:
