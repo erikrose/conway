@@ -21,7 +21,7 @@ def main():
     """Play Conway's Game of Life on the terminal."""
     def die((x, y)):
         """Pretend any out-of-bounds cell is dead."""
-        if 0 < x < width and 0 < y < height:
+        if 0 <= x < width and 0 <= y < height:
             return x, y
 
     term = Terminal()
