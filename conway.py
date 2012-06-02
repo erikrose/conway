@@ -60,7 +60,8 @@ def clear(board, term):
 def draw(board, term, colors=(9, 10, 14)):
     """Draw a board to the terminal."""
     for (x, y), state in board.iteritems():
-        print term.move(y, x) + term.on_color(colors[state])(' '),
+        with term.location(y=y, x=x):
+            print term.on_color(colors[state])(' '),
 
 
 def next_board(board, wrap=lambda p: p):
