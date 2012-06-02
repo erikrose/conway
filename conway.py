@@ -53,8 +53,8 @@ def random_board(max_x, max_y):
 
 def clear(board, term):
     """Clear the droppings of the given board."""
-    for x, y in board.iterkeys():
-        print term.move(y, x) + ' ',
+    for y in xrange(term.height):
+        print term.move(y, 0) + term.clear_eol,
 
 
 def draw(board, term, colors=(9, 10, 14)):
