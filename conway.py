@@ -28,13 +28,14 @@ def main():
     width = term.width
     height = term.height
     board = random_board(width - 1, height - 1)
+    cells = colored_cells(term)
 
     print term.civis,  # hide cursor
     print term.clear,
     while True:
         try:
             board = next_board(board, wrap=die)
-            draw(board, term)
+            draw(board, term, cells)
             stdout.flush()
             sleep(0.05)
         except KeyboardInterrupt:
@@ -42,6 +43,23 @@ def main():
         finally:
             clear(board, term)
     print term.cnorm
+
+
+def colored_cells(term):
+    """Return the strings that represent each living cell state onscreen.
+
+    Return the most colorful ones that the terminal supports.
+
+    """
+    num_colors = term.number_of_colors
+    if num_colors >= 16:
+        funcs = term.on_bright_red, term.on_bright_green, term.on_bright_cyan
+    elif num_colors >= 8:
+        funcs = term.on_red, term.on_green, term.on_blue
+    else:
+        funcs = (term.reverse,) * 3
+    # Wrap spaces in whatever pretty colors we chose:
+    return [f(' ') for f in funcs]
 
 
 def random_board(max_x, max_y):
@@ -57,11 +75,11 @@ def clear(board, term):
         print term.move(y, 0) + term.clear_eol,
 
 
-def draw(board, term, colors=(9, 10, 14)):
+def draw(board, term, cells):
     """Draw a board to the terminal."""
     for (x, y), state in board.iteritems():
         with term.location(y=y, x=x):
-            print term.on_color(colors[state])(' '),
+            print cells[state],
 
 
 def next_board(board, wrap=lambda p: p):
