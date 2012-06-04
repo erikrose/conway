@@ -57,7 +57,11 @@ def colored_cells(term):
     elif num_colors >= 8:
         funcs = term.on_red, term.on_green, term.on_blue
     else:
-        funcs = (term.reverse,) * 3
+        # For black and white, use the checkerboard cursor from the vt100
+        # alternate charset:
+        return (term.reverse(' '),
+                term.smacs + term.reverse('a') + term.rmacs,
+                term.smacs + 'a' + term.rmacs)
     # Wrap spaces in whatever pretty colors we chose:
     return [f(' ') for f in funcs]
 
