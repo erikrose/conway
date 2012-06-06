@@ -41,7 +41,7 @@ def main():
         except KeyboardInterrupt:
             break
         finally:
-            clear(board, term)
+            clear(board, term, height)
     print term.cnorm
 
 
@@ -73,9 +73,9 @@ def random_board(max_x, max_y):
                 xrange(int(max_x * max_y / LOAD_FACTOR)))
 
 
-def clear(board, term):
+def clear(board, term, height):
     """Clear the droppings of the given board."""
-    for y in xrange(term.height):
+    for y in xrange(height):
         print term.move(y, 0) + term.clear_eol,
 
 
