@@ -24,10 +24,14 @@ def main():
         if 0 <= x < width and 0 <= y < height:
             return x, y
 
+    LOAD_FACTOR = 9  # Smaller means more crowded.
+    NUDGING_LOAD_FACTOR = LOAD_FACTOR * 3  # Smaller means a bigger nudge.
+
     term = Terminal()
     width = term.width
     height = term.height
-    board = random_board(width - 1, height - 1)
+    board = random_board(width - 1, height - 1, LOAD_FACTOR)
+    detector = BoredomDetector()
     cells = cell_strings(term)
 
     print term.civis,  # hide cursor
@@ -36,6 +40,12 @@ def main():
         try:
             board = next_board(board, die)
             draw(board, term, cells)
+
+            # If the pattern is stuck in a loop, give it a nudge:
+            if detector.is_bored_of(board):
+                board.update(
+                    random_board(width - 1, height - 1, NUDGING_LOAD_FACTOR))
+
             stdout.flush()
             sleep(0.05)
         except KeyboardInterrupt:
@@ -66,11 +76,10 @@ def cell_strings(term):
     return [f(' ') for f in funcs]
 
 
-def random_board(max_x, max_y):
+def random_board(max_x, max_y, load_factor):
     """Return a random board with given max x and y coords."""
-    LOAD_FACTOR = 9  # Smaller means more crowded.
     return dict(((randint(0, max_x), randint(0, max_y)), 0) for _ in
-                xrange(int(max_x * max_y / LOAD_FACTOR)))
+                xrange(int(max_x * max_y / load_factor)))
 
 
 def clear(board, term, height):
@@ -129,6 +138,42 @@ def neighbors((x, y)):
     yield x + 1, y - 1
     yield x - 1, y + 1
     yield x - 1, y - 1
+
+
+class BoredomDetector(object):
+    """Detector of when the simulation gets stuck in a loop"""
+
+    # Get bored after (at minimum) this many repetitions of a pattern:
+    REPETITIONS = 14
+
+    # We can detect cyclical patterns of up to this many iterations:
+    PATTERN_LENGTH = 4
+
+    def __init__(self):
+        # Make is_bored_of() init the state the first time through:
+        self.iteration = self.REPETITIONS * self.PATTERN_LENGTH + 1
+
+        self.num = self.times = 0
+
+    def is_bored_of(self, board):
+        """Return whether the simulation is probably in a loop.
+
+        This is a stochastic guess. Basically, it detects whether the
+        simulation has had the same number of cells a lot lately. May have
+        false positives (like if you just have a screen full of gliders) or
+        take awhile to catch on sometimes, but it's simple and fast.
+
+        """
+        self.iteration += 1
+        if len(board) == self.num:
+            self.times += 1
+        is_bored = self.times > self.REPETITIONS
+        if self.iteration > self.REPETITIONS * self.PATTERN_LENGTH or is_bored:
+            # A little randomness in case things divide evenly into each other:
+            self.iteration = randint(-2, 0)
+            self.num = len(board)
+            self.times = 0
+        return is_bored
 
 
 if __name__ == '__main__':
