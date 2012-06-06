@@ -12,7 +12,7 @@ A board is represented like this::
 from itertools import chain
 from random import randint
 from sys import stdout
-from time import sleep
+from time import sleep, time
 
 from blessings import Terminal
 
@@ -38,6 +38,8 @@ def main():
     print term.clear,
     while True:
         try:
+            target_time = time() + 0.05
+
             board = next_board(board, die)
             draw(board, term, cells)
 
@@ -47,7 +49,11 @@ def main():
                     random_board(width - 1, height - 1, NUDGING_LOAD_FACTOR))
 
             stdout.flush()
-            sleep(0.05)
+
+            # Cap FPS:
+            now = time()
+            if now < target_time:
+                sleep(target_time - now)
         except KeyboardInterrupt:
             break
         finally:
