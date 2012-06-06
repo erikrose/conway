@@ -68,7 +68,7 @@ def cell_strings(term):
 
 def random_board(max_x, max_y):
     """Return a random board with given max x and y coords."""
-    LOAD_FACTOR = 10  # Smaller means more crowded.
+    LOAD_FACTOR = 9  # Smaller means more crowded.
     return dict(((randint(0, max_x), randint(0, max_y)), 0) for _ in
                 xrange(int(max_x * max_y / LOAD_FACTOR)))
 
