@@ -28,13 +28,13 @@ def main():
     width = term.width
     height = term.height
     board = random_board(width - 1, height - 1)
-    cells = colored_cells(term)
+    cells = cell_strings(term)
 
     print term.civis,  # hide cursor
     print term.clear,
     while True:
         try:
-            board = next_board(board, wrap=die)
+            board = next_board(board, die)
             draw(board, term, cells)
             stdout.flush()
             sleep(0.05)
@@ -45,10 +45,10 @@ def main():
     print term.cnorm
 
 
-def colored_cells(term):
-    """Return the strings that represent each living cell state onscreen.
+def cell_strings(term):
+    """Return the strings that represent each possible living cell state.
 
-    Return the most colorful ones that the terminal supports.
+    Return the most colorful ones the terminal supports.
 
     """
     num_colors = term.number_of_colors
@@ -82,11 +82,11 @@ def clear(board, term):
 def draw(board, term, cells):
     """Draw a board to the terminal."""
     for (x, y), state in board.iteritems():
-        with term.location(y=y, x=x):
+        with term.location(x, y):
             print cells[state],
 
 
-def next_board(board, wrap=lambda p: p):
+def next_board(board, wrap):
     """Given a board, return the board one interation later.
 
     Adapted from Jack Diedrich's implementation from his 2012 PyCon talk "Stop
