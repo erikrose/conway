@@ -34,7 +34,7 @@ def main():
     detector = BoredomDetector()
     cells = cell_strings(term)
 
-    print term.civis,  # hide cursor
+    print term.hide_cursor,
     print term.clear,
     try:
         while True:
@@ -53,7 +53,7 @@ def main():
             clear(board, term, height)
     except KeyboardInterrupt:
         clear(board, term, height)
-    print term.cnorm
+    print term.normal_cursor
 
 
 def sleep_until(target_time):
