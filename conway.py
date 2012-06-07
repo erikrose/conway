@@ -36,29 +36,38 @@ def main():
 
     print term.civis,  # hide cursor
     print term.clear,
-    while True:
+    for frame_end in seconds_from_now(0.05):
         try:
-            target_time = time() + 0.05
-
             board = next_board(board, die)
             draw(board, term, cells)
 
             # If the pattern is stuck in a loop, give it a nudge:
             if detector.is_bored_of(board):
-                board.update(
-                    random_board(width - 1, height - 1, NUDGING_LOAD_FACTOR))
+                board.update(random_board(width - 1,
+                                          height - 1,
+                                          NUDGING_LOAD_FACTOR))
 
             stdout.flush()
 
             # Cap FPS:
-            now = time()
-            if now < target_time:
-                sleep(target_time - now)
+            sleep_until(frame_end)
         except KeyboardInterrupt:
             break
         finally:
             clear(board, term, height)
     print term.cnorm
+
+
+def sleep_until(target_time):
+    now = time()
+    if now < target_time:
+        sleep(target_time - now)
+
+
+def seconds_from_now(seconds):
+    """Infinitely yield timestamps a given number of seconds from now."""
+    while True:
+        yield time() + seconds
 
 
 def cell_strings(term):
