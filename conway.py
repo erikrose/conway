@@ -36,8 +36,8 @@ def main():
 
     print term.civis,  # hide cursor
     print term.clear,
-    for frame_end in seconds_from_now(0.05):
-        try:
+    try:
+        for frame_end in seconds_from_now(0.05):
             board = next_board(board, die)
             draw(board, term, cells)
 
@@ -48,13 +48,10 @@ def main():
                                           NUDGING_LOAD_FACTOR))
 
             stdout.flush()
-
-            # Cap FPS:
             sleep_until(frame_end)
-        except KeyboardInterrupt:
-            break
-        finally:
             clear(board, term, height)
+    except KeyboardInterrupt:
+        clear(board, term, height)
     print term.cnorm
 
 
