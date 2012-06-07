@@ -37,7 +37,8 @@ def main():
     print term.civis,  # hide cursor
     print term.clear,
     try:
-        for frame_end in seconds_from_now(0.05):
+        while True:
+            frame_end = time() + 0.05
             board = next_board(board, die)
             draw(board, term, cells)
 
@@ -56,15 +57,10 @@ def main():
 
 
 def sleep_until(target_time):
+    """If the given time (in secs) hasn't passed, sleep until it arrives."""
     now = time()
     if now < target_time:
         sleep(target_time - now)
-
-
-def seconds_from_now(seconds):
-    """Infinitely yield timestamps a given number of seconds from now."""
-    while True:
-        yield time() + seconds
 
 
 def cell_strings(term):
@@ -173,7 +169,8 @@ class BoredomDetector(object):
         This is a stochastic guess. Basically, it detects whether the
         simulation has had the same number of cells a lot lately. May have
         false positives (like if you just have a screen full of gliders) or
-        take awhile to catch on sometimes, but it's simple and fast.
+        take awhile to catch on sometimes. I've even seen it totally miss the
+        boat once. But it's simple and fast.
 
         """
         self.iteration += 1
