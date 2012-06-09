@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='conway',
-    version='1.0',
-    description="A simple Game Of Life demo using the Blessings terminal lib",
+    version='1.1',
+    description="A simple, colorful Game Of Life demo on the terminal",
     long_description=open('README.rst').read(),
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
@@ -15,7 +15,7 @@ setup(
     scripts=['bin/conway.py'],
     url='https://github.com/erikrose/conway',
     include_package_data=True,
-    install_requires=['blessings>=1.4,<2.0'],
+    install_requires=['blessings>=1.5,<2.0'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Console :: Curses',

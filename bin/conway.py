@@ -9,6 +9,7 @@ A board is represented like this::
 ...where ``state`` is an int from 0..2 representing a color.
 
 """
+from contextlib import nested
 from itertools import chain
 from random import randint
 from sys import stdout
@@ -34,26 +35,24 @@ def main():
     detector = BoredomDetector()
     cells = cell_strings(term)
 
-    print term.hide_cursor,
-    print term.clear,
-    try:
-        while True:
-            frame_end = time() + 0.05
-            board = next_board(board, die)
-            draw(board, term, cells)
+    with nested(term.fullscreen(), term.hidden_cursor()):
+        try:
+            while True:
+                frame_end = time() + 0.05
+                board = next_board(board, die)
+                draw(board, term, cells)
 
-            # If the pattern is stuck in a loop, give it a nudge:
-            if detector.is_bored_of(board):
-                board.update(random_board(width - 1,
-                                          height - 1,
-                                          NUDGING_LOAD_FACTOR))
+                # If the pattern is stuck in a loop, give it a nudge:
+                if detector.is_bored_of(board):
+                    board.update(random_board(width - 1,
+                                              height - 1,
+                                              NUDGING_LOAD_FACTOR))
 
-            stdout.flush()
-            sleep_until(frame_end)
+                stdout.flush()
+                sleep_until(frame_end)
+                clear(board, term, height)
+        except KeyboardInterrupt:
             clear(board, term, height)
-    except KeyboardInterrupt:
-        clear(board, term, height)
-    print term.normal_cursor
 
 
 def sleep_until(target_time):
