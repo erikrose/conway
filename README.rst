@@ -30,7 +30,7 @@ Getting it running
     pip install conway
     conway.py
 
-You should see life explode before your eyes. When you're done, hit contol-C,
+You should see life explode before your eyes. When you're done, hit control-C,
 and it'll clean up nicely after itself.
 
 
