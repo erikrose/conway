@@ -52,7 +52,7 @@ def main():
                 sleep_until(frame_end)
                 clear(board, term, height)
         except KeyboardInterrupt:
-            clear(board, term, height)
+            pass
 
 
 def sleep_until(target_time):

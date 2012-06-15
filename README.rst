@@ -39,3 +39,14 @@ Kudos
 
 Ripped off a really elegant implementation of the algorithm from Jack Diedrich
 (and ruined it).
+
+
+Version History
+===============
+
+1.1
+  * Use "fullscreen mode" so we don't leave a big white screen behind
+    afterward.
+
+1.0
+  * Initial release
