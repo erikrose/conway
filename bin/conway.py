@@ -9,6 +9,7 @@ A board is represented like this::
 ...where ``state`` is an int from 0..2 representing a color.
 
 """
+import argparse
 from contextlib import nested
 from itertools import chain
 from random import randint
@@ -20,6 +21,11 @@ from blessings import Terminal
 
 def main():
     """Play Conway's Game of Life on the terminal."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--sleep', type=float, default=0.05,
+                        help='sleep time')
+    args = parser.parse_args()
+
     def die((x, y)):
         """Pretend any out-of-bounds cell is dead."""
         if 0 <= x < width and 0 <= y < height:
@@ -38,7 +44,7 @@ def main():
     with nested(term.fullscreen(), term.hidden_cursor()):
         try:
             while True:
-                frame_end = time() + 0.05
+                frame_end = time() + args.sleep
                 board = next_board(board, die)
                 draw(board, term, cells)
 
