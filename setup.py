@@ -15,7 +15,7 @@ setup(
     scripts=['bin/conway.py'],
     url='https://github.com/erikrose/conway',
     include_package_data=True,
-    install_requires=['blessings>=1.5,<2.0'],
+    install_requires=['blessings>=1.5,<2.0', 'six'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Console :: Curses',
