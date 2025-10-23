@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Conway's Game of Life, drawn to the terminal care of the Blessings lib
 
 A board is represented like this::
@@ -9,7 +9,6 @@ A board is represented like this::
 ...where ``state`` is an int from 0..2 representing a color.
 
 """
-from contextlib import nested
 from itertools import chain
 from random import randint
 from sys import stdout
@@ -20,8 +19,9 @@ from blessings import Terminal
 
 def main():
     """Play Conway's Game of Life on the terminal."""
-    def die((x, y)):
+    def die(xy):
         """Pretend any out-of-bounds cell is dead."""
+        x, y = xy
         if 0 <= x < width and 0 <= y < height:
             return x, y
 
@@ -35,7 +35,7 @@ def main():
     detector = BoredomDetector()
     cells = cell_strings(term)
 
-    with nested(term.fullscreen(), term.hidden_cursor()):
+    with term.fullscreen(), term.hidden_cursor():
         try:
             while True:
                 frame_end = time() + 0.05
@@ -86,20 +86,20 @@ def cell_strings(term):
 def random_board(max_x, max_y, load_factor):
     """Return a random board with given max x and y coords."""
     return dict(((randint(0, max_x), randint(0, max_y)), 0) for _ in
-                xrange(int(max_x * max_y / load_factor)))
+                range(int(max_x * max_y / load_factor)))
 
 
 def clear(board, term, height):
     """Clear the droppings of the given board."""
-    for y in xrange(height):
-        print term.move(y, 0) + term.clear_eol,
+    for y in range(height):
+        print(term.move(y, 0) + term.clear_eol, end='')
 
 
 def draw(board, term, cells):
     """Draw a board to the terminal."""
-    for (x, y), state in board.iteritems():
+    for (x, y), state in board.items():
         with term.location(x, y):
-            print cells[state],
+            print(cells[state], end='')
 
 
 def next_board(board, wrap):
@@ -115,7 +115,7 @@ def next_board(board, wrap):
     new_board = {}
 
     # We need consider only the points that are alive and their neighbors:
-    points_to_recalc = set(board.iterkeys()) | set(chain(*map(neighbors, board)))
+    points_to_recalc = set(board.keys()) | set(chain(*map(neighbors, board)))
 
     for point in points_to_recalc:
         count = sum((neigh in board) for neigh in
@@ -135,8 +135,9 @@ def next_board(board, wrap):
     return new_board
 
 
-def neighbors((x, y)):
+def neighbors(xy):
     """Return the (possibly out of bounds) neighbors of a point."""
+    x, y = xy
     yield x + 1, y
     yield x - 1, y
     yield x, y + 1
